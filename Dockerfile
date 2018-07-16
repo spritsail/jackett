@@ -19,6 +19,8 @@ COPY entrypoint.sh /usr/bin/entrypoint
 RUN apk add --no-cache libcurl mono-reference-assemblies-facades ca-certificates-mono \
  && wget -O- https://github.com/Jackett/Jackett/releases/download/v${JACKETT_VER}/Jackett.Binaries.Mono.tar.gz | \
       tar xz --strip-components=1 \
+ # Shed some useless fluff
+ && rm -f *.pdb install_service_macos JackettUpdater.exe Upstart.config \
  # Fix weird perms on the extracted files
  && chown -R ${SUID}:${SGID} /jackett \
  # Silence error: https://github.com/Jackett/Jackett/blob/master/src/Jackett.Server/Services/ServerService.cs#L157
