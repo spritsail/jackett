@@ -2,7 +2,8 @@ FROM spritsail/mono:4.5
 
 ARG JACKETT_VER=0.9.6
 
-ENV SUID=912 SGID=912
+ENV SUID=912 SGID=912 \
+    XDG_CONFIG_HOME=/config
 
 LABEL maintainer="Spritsail <jackett@spritsail.io>" \
       org.label-schema.vendor="Spritsail" \
