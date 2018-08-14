@@ -4,25 +4,13 @@ pipeline:
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     repo: jackett-dev
 
-  test:
-    image: docker
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    commands:
-      - apk add --no-cache curl
-      - CON_NAME=$(docker run -dt jackett-dev)
-      - timeout -t 10 -- docker logs -f $$CON_NAME | cat &
-      - sleep 10
-      - IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
-      - if [ -z "$IP" ]; then
-            echo "The container exited.. sadpanda";
-            docker inspect --format='{{.State.ExitCode}}' $$CON_NAME;
-            docker rm $$CON_NAME
-            exit 25;
-        fi
-      - curl -L --retry-max-time 30 --max-time 5 --retry 10 --retry-delay 5 --retry-connrefused -c /dev/null $IP:9117 > /dev/null
-      - docker kill $$CON_NAME
-      - docker rm $$CON_NAME
 
+  test:
+    image: spritsail/docker-test
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    repo: jackett-dev
+    curl: ':9117'
+    curl_opts: '-c /dev/null'
 
   publish:
     image: spritsail/docker-publish
