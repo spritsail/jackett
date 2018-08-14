@@ -19,7 +19,7 @@ pipeline:
             docker rm $$CON_NAME
             exit 25;
         fi
-      - curl -L --retry-max-time 30 --max-time 5 --retry 10 --retry-delay 5 --retry-connrefused $IP:9117 > /dev/null
+      - curl -L --retry-max-time 30 --max-time 5 --retry 10 --retry-delay 5 --retry-connrefused -c /dev/null $IP:9117 > /dev/null
       - docker kill $$CON_NAME
       - docker rm $$CON_NAME
 
