@@ -20,6 +20,9 @@ COPY entrypoint.sh /usr/bin/entrypoint
 RUN apk add --no-cache libcurl mono-reference-assemblies-facades ca-certificates-mono \
  && wget -O- https://github.com/Jackett/Jackett/releases/download/v${JACKETT_VER}/Jackett.Binaries.Mono.tar.gz | \
       tar xz --strip-components=1 \
+ # Take the single DLL requirement out of facades to save space
+ && mv /usr/lib/mono/4.5/Facades/System.Runtime.InteropServices.RuntimeInformation.dll . \
+ && apk del --no-cache mono-reference-assemblies-facades \
  # Shed some useless fluff
  && rm -f *.pdb install_service_macos JackettUpdater.exe Upstart.config \
  # Fix weird perms on the extracted files
