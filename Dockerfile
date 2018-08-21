@@ -25,6 +25,8 @@ RUN apk add --no-cache libcurl mono-reference-assemblies-facades ca-certificates
  && apk del --no-cache mono-reference-assemblies-facades \
  # Shed some useless fluff
  && rm -f *.pdb install_service_macos JackettUpdater.exe Upstart.config \
+ # Remove duplicated assemblies that already exist as a part of Mono
+ && find /jackett /usr/lib/mono/gac -name \*.dll -exec basename "{}" \; | sort | uniq -d | xargs rm -rf \
  # Fix weird perms on the extracted files
  && chown -R ${SUID}:${SGID} /jackett \
  # Silence error: https://github.com/Jackett/Jackett/blob/master/src/Jackett.Server/Services/ServerService.cs#L157
