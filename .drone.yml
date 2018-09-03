@@ -16,12 +16,12 @@ pipeline:
     image: spritsail/docker-publish
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     secrets: [ docker_username, docker_password, microbadger_token ]
-    when: { branch: [ master, pass ], event: [ push, tag, deployment ] }
+    when: { branch: [ master ], event: [ push, tag, deployment ] }
     from: jackett-dev
     repo: spritsail/jackett
     tags:
       - 'latest'
-      - '%label: io.spritsail.version.jackett'
+      - '%label io.spritsail.version.jackett'
 
   notify:
     image: spritsail/notify
