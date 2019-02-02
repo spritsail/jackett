@@ -35,5 +35,8 @@ VOLUME ["/config"]
 
 EXPOSE 9117
 
+HEALTHCHECK --start-period=10s --timeout=5s \
+    CMD wget -qO /dev/null 'http://localhost:9117/torznab/all'
+
 ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/entrypoint"]
 CMD ["mono", "/jackett/JackettConsole.exe", "-x", "-d", "/config", "--NoUpdates"]
