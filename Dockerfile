@@ -38,5 +38,9 @@ EXPOSE 9117
 HEALTHCHECK --start-period=10s --timeout=5s \
     CMD wget -qO /dev/null 'http://localhost:9117/torznab/all'
 
+# Use mono fallback inotify polling instead of native
+# because the implementation in 5.20 doesn't seem to work
+ENV MONO_MANAGED_WATCHER=dummy
+
 ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/entrypoint"]
 CMD ["mono", "/jackett/JackettConsole.exe", "-x", "-d", "/config", "--NoUpdates"]
