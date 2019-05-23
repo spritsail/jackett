@@ -1,7 +1,28 @@
-FROM spritsail/mono:4.5
-
 ARG JACKETT_VER=0.11.542
 
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine3.9 AS dotnet
+
+ARG JACKETT_VER
+
+WORKDIR /tmp
+RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
+        | tar xz --strip-components=1 \
+ && cd src/Jackett.Server/ \
+ && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > runtimeconfig.template.json \
+ && dotnet publish -c Release -r linux-musl-x64 -f netcoreapp2.2 /p:TrimUnusedDependencies=true -o /out \
+    \
+    # Clean up!
+ && apk --no-cache add binutils \
+ && cd /out \
+ # && chmod 644 *.dll *.so \
+ && chmod +x jackett \
+ && strip -s /out/*.so
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+FROM spritsail/alpine:3.9
+
+ARG JACKETT_VER
 ENV SUID=912 SGID=912 \
     XDG_CONFIG_HOME=/config
 
@@ -15,20 +36,10 @@ LABEL maintainer="Spritsail <jackett@spritsail.io>" \
 
 WORKDIR /jackett
 
+COPY --from=dotnet /out .
 COPY entrypoint.sh /usr/bin/entrypoint
 
-RUN apk add --no-cache libcurl mono-reference-assemblies-facades ca-certificates-mono \
- && wget -O- https://github.com/Jackett/Jackett/releases/download/v${JACKETT_VER}/Jackett.Binaries.Mono.tar.gz | \
-      tar xz --strip-components=1 \
- # Take the single DLL requirement out of facades to save space
- && mv /usr/lib/mono/4.5/Facades/System.Runtime.InteropServices.RuntimeInformation.dll . \
- && apk del --no-cache mono-reference-assemblies-facades \
- # Shed some useless fluff
- && rm -f *.pdb install_service_macos JackettUpdater.exe Upstart.config \
- # Fix weird perms on the extracted files
- && chown -R ${SUID}:${SGID} /jackett \
- # Silence error: https://github.com/Jackett/Jackett/blob/master/src/Jackett.Server/Services/ServerService.cs#L157
- && touch /usr/lib/mono/4.5/mono-api-info.exe \
+RUN apk add --no-cache libcurl libgcc libstdc++ libintl \
  && chmod +x /usr/bin/entrypoint
 
 VOLUME ["/config"]
@@ -38,9 +49,5 @@ EXPOSE 9117
 HEALTHCHECK --start-period=10s --timeout=5s \
     CMD wget -qO /dev/null 'http://localhost:9117/torznab/all'
 
-# Use mono fallback inotify polling instead of native
-# because the implementation in 5.20 doesn't seem to work
-ENV MONO_MANAGED_WATCHER=dummy
-
 ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/entrypoint"]
-CMD ["mono", "/jackett/JackettConsole.exe", "-x", "-d", "/config", "--NoUpdates"]
+CMD ["/jackett/jackett", "-x", "-d", "/config", "--NoUpdates"]

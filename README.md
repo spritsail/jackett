@@ -13,7 +13,9 @@
 [![Build Status](https://drone.spritsail.io/api/badges/spritsail/jackett/status.svg)][drone]
 
 
-[Jackett](https://github.com/Jackett/Jackett) running in Alpine Linux, with only the bare essentials required to run.
+[Jackett](https://github.com/Jackett/Jackett) dotnet build, running in Alpine Linux, with only the bare essentials required to run.
+
+**This is an experimental dotnet build of Jackett. Proceed with caution**
 
 ### Usage
 

@@ -2,13 +2,13 @@ pipeline:
   build:
     image: spritsail/docker-build
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    repo: jackett-dev
+    repo: jackett-dotnet-dev
 
 
   test:
     image: spritsail/docker-test
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    repo: jackett-dev
+    repo: jackett-dotnet-dev
     curl: ':9117'
     curl_opts: '-c /dev/null'
 
@@ -16,12 +16,12 @@ pipeline:
     image: spritsail/docker-publish
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     secrets: [ docker_username, docker_password, microbadger_token ]
-    when: { branch: [ master ], event: [ push, tag, deployment ] }
-    from: jackett-dev
+    when: { branch: [ dotnet ], event: [ push, tag, deployment ] }
+    from: jackett-dotnet-dev
     repo: spritsail/jackett
     tags:
-      - 'latest'
-      - '%label io.spritsail.version.jackett'
+      - 'dotnet'
+      - '%label io.spritsail.version.jackett | %prefix dotnet'
 
   notify:
     image: spritsail/notify
