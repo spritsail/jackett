@@ -1,26 +1,26 @@
 ARG JACKETT_VER=0.13.188
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine3.9 AS dotnet
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine3.11 AS dotnet
 
 ARG JACKETT_VER
 
 WORKDIR /tmp
 RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
         | tar xz --strip-components=1 \
- && cd src/Jackett.Server/ \
- && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > runtimeconfig.template.json \
- && dotnet publish -c Release -r linux-musl-x64 -f netcoreapp2.2 /p:TrimUnusedDependencies=true -o /out \
+ && cd src \
+ && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > Jackett.Server/runtimeconfig.template.json \
+ && dotnet publish Jackett.Server -f netcoreapp3.1 --self-contained -c Release -r linux-musl-x64 /p:TrimUnusedDependencies=true /p:PublishTrimmed=true -o /out \
     \
     # Clean up!
  && apk --no-cache add binutils \
  && cd /out \
- # && chmod 644 *.dll *.so \
+ && rm -f *.pdb \
  && chmod +x jackett \
  && strip -s /out/*.so
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FROM spritsail/alpine:3.10
+FROM spritsail/alpine:3.11
 
 ARG JACKETT_VER
 ENV SUID=912 SGID=912 \

@@ -28,27 +28,20 @@ steps:
     from: jackett-dotnet-dev
     repo: spritsail/jackett
     tags:
-    - 'dotnet'
+    - dotnet
     - '%label io.spritsail.version.jackett | %prefix dotnet'
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
+    username:
       from_secret: docker_username
+    password:
+      from_secret: docker_password
   when:
     branch:
     - dotnet
     event:
     - push
-    - tag
-
-  notify:
-    image: spritsail/notify
-    when: { status: [ success, failure ] }
-    secrets: [ webhook_url, notify_token ]
 
 ---
 kind: signature
-hmac: 2d7f22662ae1602b9f1ca639c4fba8a967908cf93c8ee36b64be477e97996ebc
+hmac: 00146c6b1e658c5df6616d41c81c02b380ebd8e027da639cce9402cef8d826fb
 
 ...
