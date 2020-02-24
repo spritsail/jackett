@@ -1,29 +1,54 @@
-pipeline:
-  build:
-    image: spritsail/docker-build
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: always
+  image: spritsail/docker-build
+  settings:
     repo: jackett-dotnet-dev
 
-
-  test:
-    image: spritsail/docker-test
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+- name: test
+  pull: always
+  image: spritsail/docker-test
+  settings:
+    curl: :9117
+    curl_opts: -c /dev/null
     repo: jackett-dotnet-dev
-    curl: ':9117'
-    curl_opts: '-c /dev/null'
 
-  publish:
-    image: spritsail/docker-publish
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    secrets: [ docker_username, docker_password, microbadger_token ]
-    when: { branch: [ dotnet ], event: [ push, tag, deployment ] }
+- name: publish
+  pull: always
+  image: spritsail/docker-publish
+  settings:
     from: jackett-dotnet-dev
     repo: spritsail/jackett
     tags:
-      - 'dotnet'
-      - '%label io.spritsail.version.jackett | %prefix dotnet'
+    - 'dotnet'
+    - '%label io.spritsail.version.jackett | %prefix dotnet'
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    DOCKER_USERNAME:
+      from_secret: docker_username
+  when:
+    branch:
+    - dotnet
+    event:
+    - push
+    - tag
 
   notify:
     image: spritsail/notify
     when: { status: [ success, failure ] }
     secrets: [ webhook_url, notify_token ]
+
+---
+kind: signature
+hmac: 2d7f22662ae1602b9f1ca639c4fba8a967908cf93c8ee36b64be477e97996ebc
+
+...
