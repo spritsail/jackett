@@ -30,33 +30,18 @@ steps:
     tags:
     - latest
     - "%label io.spritsail.version.jackett"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
+    username:
       from_secret: docker_username
+    password:
+      from_secret: docker_password
   when:
     branch:
     - master
     event:
     - push
-    - tag
-
-- name: notify
-  pull: always
-  image: spritsail/notify
-  environment:
-    NOTIFY_TOKEN:
-      from_secret: notify_token
-    WEBHOOK_URL:
-      from_secret: webhook_url
-  when:
-    status:
-    - success
-    - failure
 
 ---
 kind: signature
-hmac: 34e63c15fe3a10a52b337a94a9836f7a14fcaff52ca775c2980fff37c52cdf9d
+hmac: 006e85e500f27e48f470c51eec97888b87a2ab1f7f213a6b97489ff96ed2e75f
 
 ...
