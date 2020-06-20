@@ -1,6 +1,6 @@
-ARG JACKETT_VER=0.14.476
+ARG JACKETT_VER=0.16.735
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine3.11 AS dotnet
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS dotnet
 
 ARG JACKETT_VER
 
