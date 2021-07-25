@@ -1,6 +1,6 @@
 ARG JACKETT_VER=0.18.475
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS dotnet
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0.100-preview.3-alpine AS dotnet
 
 ARG JACKETT_VER
 
@@ -9,7 +9,7 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
         | tar xz --strip-components=1 \
  && cd src \
  && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > Jackett.Server/runtimeconfig.template.json \
- && dotnet publish Jackett.Server -f netcoreapp3.1 --self-contained -c Release -r linux-musl-x64 /p:TrimUnusedDependencies=true /p:PublishTrimmed=true -o /out \
+ && dotnet publish Jackett.Server -f net5.0 --self-contained -c Release -r linux-musl-x64 /p:TrimUnusedDependencies=true /p:PublishTrimmed=true -o /out \
     \
     # Clean up!
  && apk --no-cache add binutils \
