@@ -1,6 +1,6 @@
 ARG JACKETT_VER=0.18.545
 
-FROM mcr.microsoft.com/dotnet/core/sdk:5.0.100-preview.3-alpine AS dotnet
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS dotnet
 
 ARG JACKETT_VER
 
@@ -8,8 +8,24 @@ WORKDIR /tmp
 RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
         | tar xz --strip-components=1 \
  && cd src \
+    # Prevents the following crash on startup:
+    #   Process terminated. Couldn't find a valid ICU package installed on the
+    #   system. Set the configuration flag System.Globalization.Invariant to
+    #   true if you want to run with no globalization support.
  && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > Jackett.Server/runtimeconfig.template.json \
- && dotnet publish Jackett.Server -f net5.0 --self-contained -c Release -r linux-musl-x64 /p:TrimUnusedDependencies=true /p:PublishTrimmed=true -o /out \
+    # https://github.com/Jackett/Jackett/blob/b695ba285c71faa4804046fd134121654bbccbce/azure-pipelines.yml#L94
+ && dotnet publish Jackett.Server \
+        --self-contained \
+        -f net5.0 \
+        -c Release \
+        -r linux-musl-x64 \
+        /p:AssemblyVersion=${JACKETT_VER} \
+        /p:FileVersion=${JACKETT_VER} \
+        /p:InformationalVersion=${JACKETT_VER} \
+        /p:Version=${JACKETT_VER} \
+        /p:TrimUnusedDependencies=true \
+        /p:PublishTrimmed=true \
+        -o /out \
     \
     # Clean up!
  && apk --no-cache add binutils \
@@ -20,7 +36,7 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FROM spritsail/alpine:3.12
+FROM spritsail/alpine:3.14
 
 ARG JACKETT_VER
 ENV SUID=912 SGID=912 \
