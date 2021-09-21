@@ -1,4 +1,4 @@
-ARG JACKETT_VER=0.18.786
+ARG JACKETT_VER=0.18.788
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS dotnet
 
