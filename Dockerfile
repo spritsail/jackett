@@ -1,6 +1,6 @@
 ARG JACKETT_VER=0.20.44
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS dotnet
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS dotnet
 
 ARG JACKETT_VER
 
@@ -12,11 +12,11 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
     #   Process terminated. Couldn't find a valid ICU package installed on the
     #   system. Set the configuration flag System.Globalization.Invariant to
     #   true if you want to run with no globalization support.
- && echo '{"configProperties":{"System.Globalization.Invariant":true}}' > Jackett.Server/runtimeconfig.template.json \
+ && echo '{"configProperties":{"System.Globalization.Invariant":true,"System.Globalization.PredefinedCulturesOnly":false}}' > Jackett.Server/runtimeconfig.template.json \
     # https://github.com/Jackett/Jackett/blob/b695ba285c71faa4804046fd134121654bbccbce/azure-pipelines.yml#L94
  && dotnet publish Jackett.Server \
         --self-contained \
-        -f net5.0 \
+        -f net6.0 \
         -c Release \
         -r linux-musl-x64 \
         /p:AssemblyVersion=${JACKETT_VER} \

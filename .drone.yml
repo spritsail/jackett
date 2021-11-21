@@ -10,8 +10,6 @@ steps:
 - name: build
   pull: always
   image: spritsail/docker-build
-  settings:
-    repo: jackett-dev
 
 - name: test
   pull: always
@@ -19,21 +17,16 @@ steps:
   settings:
     curl: :9117
     curl_opts: -c /dev/null
-    repo: jackett-dev
 
 - name: publish
   pull: always
   image: spritsail/docker-publish
   settings:
-    from: jackett-dev
     repo: spritsail/jackett
     tags:
     - latest
     - "%label io.spritsail.version.jackett"
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
+    login: {from_secret: docker_login}
   when:
     branch:
     - master
@@ -42,6 +35,6 @@ steps:
 
 ---
 kind: signature
-hmac: 006e85e500f27e48f470c51eec97888b87a2ab1f7f213a6b97489ff96ed2e75f
+hmac: 010d505ed49997ef96b1502e3861ea057bad01f67d589cdc19d08dc563def29d
 
 ...
