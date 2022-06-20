@@ -14,11 +14,12 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
     #   true if you want to run with no globalization support.
  && echo '{"configProperties":{"System.Globalization.Invariant":true,"System.Globalization.PredefinedCulturesOnly":false}}' > Jackett.Server/runtimeconfig.template.json \
     # https://github.com/Jackett/Jackett/blob/b695ba285c71faa4804046fd134121654bbccbce/azure-pipelines.yml#L94
+ && test "$(uname -m)" = aarch64 && ARCH=arm64 || ARCH=x64 \
  && dotnet publish Jackett.Server \
         --self-contained \
         -f net6.0 \
         -c Release \
-        -r linux-musl-x64 \
+        -r linux-musl-${ARCH} \
         /p:AssemblyVersion=${JACKETT_VER} \
         /p:FileVersion=${JACKETT_VER} \
         /p:InformationalVersion=${JACKETT_VER} \
@@ -36,7 +37,7 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FROM spritsail/alpine:3.14
+FROM spritsail/alpine:3.16
 
 ARG JACKETT_VER
 ENV SUID=912 SGID=912 \
