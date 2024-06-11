@@ -36,7 +36,7 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FROM spritsail/alpine:3.18
+FROM spritsail/alpine:3.20
 
 ARG JACKETT_VER
 ENV SUID=912 SGID=912 \
