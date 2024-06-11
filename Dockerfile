@@ -1,6 +1,6 @@
 ARG JACKETT_VER=0.21.2943
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS dotnet
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS dotnet
 
 ARG JACKETT_VER
 
@@ -17,7 +17,7 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
  && test "$(uname -m)" = aarch64 && ARCH=arm64 || ARCH=x64 \
  && dotnet publish Jackett.Server \
         --self-contained \
-        -f net6.0 \
+        -f net8.0 \
         -c Release \
         -r linux-musl-${ARCH} \
         /p:AssemblyVersion=${JACKETT_VER} \
@@ -25,7 +25,6 @@ RUN wget -O- https://github.com/Jackett/Jackett/archive/v${JACKETT_VER}.tar.gz \
         /p:InformationalVersion=${JACKETT_VER} \
         /p:Version=${JACKETT_VER} \
         /p:TrimUnusedDependencies=true \
-        /p:PublishTrimmed=true \
         -o /out \
     \
     # Clean up!
