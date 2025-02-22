@@ -3,6 +3,9 @@
 [drone]: https://drone.spritsail.io/spritsail/jackett
 [mbdg]: https://microbadger.com/images/spritsail/jackett
 
+# DEPRECATED
+This image is no longer maintained or updated
+
 # [spritsail/Jackett][hub]
 
 [![](https://images.microbadger.com/badges/image/spritsail/jackett.svg)][mbdg]
